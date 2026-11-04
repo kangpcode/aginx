@@ -1,0 +1,30 @@
+name: AGinX
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go: [stable, oldstable]
+    env:
+      AGINX_REQUIRE_TCP: '1'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version: ${{ matrix.go }}
+          cache: false
+      - name: Format
+        run: test -z "$(gofmt -l cmd internal)"
+      - name: Vet, tests, race, static build
+        run: make check
+      - name: Fuzz smoke
+        run: make fuzz
+      - name: Validate runnable sample
+        run: ./bin/aginx -t -config examples/www/.ginxaccess
+      - name: Verify ELF has no dynamic interpreter or dependencies
+        run: |
+          ! readelf -l bin/aginx | grep -q INTERP
+          ! readelf -d bin/aginx | grep -q NEEDED

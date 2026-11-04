@@ -1,0 +1,6 @@
+# SPESIFIKASI LENGKAP: belum didukung POC; memerlukan FastCGI.
+directory_index index.php index.html;
+directory_listing off;
+<If not file_exists and not dir_exists>
+    rewrite "^/.*$" "/index.php" last;
+</If>

@@ -1,0 +1,8 @@
+# SPESIFIKASI LENGKAP: belum didukung POC.
+allow 192.0.2.0/24;
+allow 2001:db8:1234::/48;
+deny all;
+header set X-Content-Type-Options "nosniff";
+user_agent deny "(?i)(scanner|sqlmap)";
+rate_limit 20 40;
+directory_listing off;

@@ -1,0 +1,6 @@
+# SPESIFIKASI LENGKAP: belum didukung POC.
+error_page 503 "/maintenance.html";
+header set Retry-After "600";
+<If path !~ "^/(maintenance[.]html|assets/)" >
+    respond 503;
+</If>

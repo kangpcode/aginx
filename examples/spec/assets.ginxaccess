@@ -1,0 +1,10 @@
+# SPESIFIKASI LENGKAP: belum didukung POC.
+directory_listing off;
+cache_control "text/css" "public, max-age=86400";
+cache_control "application/javascript" "public, max-age=86400";
+expires "image/*" 604800;
+hotlink allow_empty on;
+hotlink_allow "^https://(www[.])?example[.]com/";
+<Files "*.map">
+    deny all;
+</Files>

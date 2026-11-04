@@ -1,0 +1,9 @@
+# SPESIFIKASI LENGKAP: belum didukung POC.
+allow 10.20.0.0/16;
+deny all;
+auth_basic "Administrasi";
+auth_user_file "admin-users";
+header set Cache-Control "no-store";
+<Match "^/admin/legacy$">
+    redirect 308 "^/admin/legacy$" "/admin/";
+</Match>
