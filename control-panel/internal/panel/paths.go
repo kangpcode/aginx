@@ -26,6 +26,11 @@ func ResolveConfigPath(docroot, virtual string) (target, clean string, err error
 	if strings.ContainsRune(virtual, '\x00') || strings.Contains(virtual, "\\") {
 		return "", "", errors.New("path mengandung karakter tidak valid")
 	}
+	for _, part := range strings.Split(virtual, "/") {
+		if part == ".." {
+			return "", "", errors.New("path tidak boleh memuat '..'")
+		}
+	}
 	if virtual == "" {
 		virtual = "/"
 	}

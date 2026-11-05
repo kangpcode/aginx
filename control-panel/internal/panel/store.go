@@ -64,7 +64,7 @@ type Revision struct {
 	ID         string    `json:"id"`
 	SiteID     string    `json:"site_id"`
 	Path       string    `json:"path"`
-	Content    string    `json:"-"`
+	Content    string    `json:"content,omitempty"`
 	Hash       string    `json:"hash"`
 	Status     string    `json:"status"`
 	Error      string    `json:"error,omitempty"`
