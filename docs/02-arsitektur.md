@@ -53,6 +53,7 @@ aginx/
     pool/                          [rencana] bounded buffer pools, request scratch
   internal/**/*_test.go            [ada] unit, protocol integration, fuzz targets
   tests/integration/, security/    [rencana] cross-distro/VM dan attack corpus
+  scripts/live-smoke.py            [ada] TCP binary, config publish, sinyal, checksum
   bench/run.sh                     [ada] wrk commands + baseline collection
   bench/nginx.conf                 [ada] baseline konfigurasi Nginx
   bench/results/                   [generated] hasil benchmark aktual

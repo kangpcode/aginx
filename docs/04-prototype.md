@@ -8,6 +8,7 @@ make test
 make vet
 make race
 make fuzz
+make smoke
 ./bin/aginx -t -config examples/www/.ginxaccess
 ./bin/aginx -listen 127.0.0.1:8080 -root examples/www
 ```
@@ -21,6 +22,15 @@ readelf -d bin/aginx
 ```
 
 Tidak boleh ada program header `INTERP` atau dynamic dependency `NEEDED`. Binary race test menggunakan CGO; binary distribusi tetap dibangun terpisah tanpa CGO.
+
+`make smoke` memakai Python 3 standard library dan TCP loopback untuk menguji binary secara langsung: CLI validator, GET/HEAD/keep-alive, ACL dan rewrite, update tanpa restart, config rusak/last-known-good, SIGHUP, framing invalid, serta SIGTERM selama transfer 10 MiB. Docroot dan log dibuat pada direktori sementara. Untuk merekam bukti syscall, jalankan pada host yang mengizinkan socket dan tracing:
+
+```bash
+strace -f -e trace=sendfile -o /tmp/aginx-sendfile-smoke.log python3 scripts/live-smoke.py
+rg 'sendfile' /tmp/aginx-sendfile-smoke.log
+```
+
+Keberhasilan checksum bersama trace syscall memverifikasi jalur plaintext file-to-TCP, termasuk partial transfer/EAGAIN bila teramati. Ini tidak mengukur throughput karena tracing menambah overhead.
 
 ```bash
 curl -i http://127.0.0.1:8080/
@@ -86,7 +96,7 @@ GO ?= go
 export GOCACHE ?= /tmp/aginx-go-cache
 export GOMODCACHE ?= /tmp/aginx-go-modcache
 
-.PHONY: build test race vet check fuzz bench run
+.PHONY: build test race vet check fuzz bench smoke run
 build:
 	mkdir -p bin
 	CGO_ENABLED=0 $(GO) build -buildvcs=false -trimpath -ldflags='-s -w' -o bin/aginx ./cmd/aginx
@@ -102,6 +112,8 @@ fuzz:
 	$(GO) test ./internal/ginxaccess -run='^$$' -fuzz=FuzzParse -fuzztime=10s -parallel=2
 bench:
 	$(GO) test ./internal/ginxaccess -run='^$$' -bench=. -benchmem
+smoke: build
+	python3 scripts/live-smoke.py
 run: build
 	./bin/aginx -root ./examples/www
 ```

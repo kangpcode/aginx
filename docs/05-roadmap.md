@@ -7,6 +7,7 @@ Estimasi untuk satu engineer berpengalaman, fokus penuh, termasuk review dan tes
 - [x] Keputusan bahasa Go dan toolchain deklaratif.
 - [x] Source tree, Makefile, coding standard `gofmt`, `go vet`.
 - [x] Test harness unit, integration, race, dan fuzz.
+- [x] Smoke binary melalui TCP: config update, SIGHUP, SIGTERM, dan checksum file 10 MiB.
 - [x] Workflow GitHub Actions tersedia, dengan TCP wajib.
 - [x] Repository Git tersedia pada workspace.
 - [ ] Konfirmasi workflow berjalan sukses di GitHub.
@@ -38,7 +39,7 @@ Estimasi untuk satu engineer berpengalaman, fokus penuh, termasuk review dan tes
 ## Fase 3 — Static Serving, 2–3 minggu
 
 - [x] Jalur `io.CopyN(TCPConn, File)` yang memakai sendfile bila didukung.
-- [ ] Bukti syscall sendfile di mesin tanpa pembatasan socket/ptrace.
+- [x] Bukti syscall sendfile pada TCP lokal, termasuk partial transfer/EAGAIN.
 - [x] MIME type dari extension, fallback octet-stream, nosniff.
 - [x] Fixed directory index `index.html`, directory listing off.
 - [ ] Configurable directory index dan canonical directory redirect.

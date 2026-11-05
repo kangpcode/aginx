@@ -6,6 +6,7 @@ Tidak memerlukan instalasi Apache/Nginx. Tidak ada dependency Go di luar standar
 
 ```bash
 make check
+make smoke
 ./bin/aginx -t -config examples/www/.ginxaccess
 ./bin/aginx -listen 127.0.0.1:8080 -root ./examples/www
 ```
@@ -19,6 +20,8 @@ curl --path-as-is -i http://127.0.0.1:8080/%2e%2e/etc/passwd
 ```
 
 Perubahan konfigurasi terdeteksi pada validasi metadata berikutnya, default 100 ms saat ada request. Tulis konfigurasi ke temporary file pada direktori yang sama kemudian gunakan atomic rename. File rusak mempertahankan snapshot valid terakhir yang masih berada dalam cache; file pertama yang rusak menghasilkan 503.
+
+`make smoke` memerlukan Python 3 dan izin socket TCP loopback. Pengujian menjalankan binary pada port sementara dengan docroot sementara, menguji update config, last-known-good, SIGHUP, dan drain transfer 10 MiB saat SIGTERM. Tidak mengubah docroot contoh atau memasang service. Jalur syscall `sendfile`, termasuk partial transfer dan EAGAIN, sudah teramati pada verifikasi lokal; lihat [laporan verifikasi](docs/VERIFIKASI.md).
 
 Dokumentasi sesuai urutan [CLAUDE.md](CLAUDE.md):
 

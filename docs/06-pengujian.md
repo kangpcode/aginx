@@ -21,12 +21,22 @@ Perintah verifikasi:
 make check
 make fuzz
 make bench
+make smoke
 AGINX_REQUIRE_TCP=1 make test
 GOCACHE=/tmp/aginx-go-cache go test ./... -cover
 GOCACHE=/tmp/aginx-go-cache go test ./internal/server -v
 ```
 
 Integration suite memakai TCP loopback bila tersedia. Bila sandbox menolak pembuatan socket dengan EPERM/EACCES, suite memakai `net.Pipe` dan menulis nama transport ke verbose log. Ini menguji byte stream, timeout, dan lifecycle tanpa membuktikan perilaku TCP/kernel sendfile. `AGINX_REQUIRE_TCP=1` membuat keterbatasan tersebut menjadi kegagalan dan digunakan CI. Race detector menemukan race yang terlewati oleh workload uji; kelulusan bukan pembuktian bebas semua race.
+
+`make smoke` menguji proses binary sungguhan melalui loopback, tanpa fallback `net.Pipe`. Script memakai Python 3 standard library, port ephemeral, dan docroot sementara. Cakupannya meliputi CLI, keep-alive, ACL/rewrite, update atomic tanpa reload, last-known-good/SIGHUP/recovery, CL+TE, dan checksum transfer 10 MiB saat SIGTERM. Untuk menyertakan bukti syscall pada mesin yang mengizinkan tracing:
+
+```bash
+strace -f -e trace=sendfile -o /tmp/aginx-sendfile-smoke.log python3 scripts/live-smoke.py
+rg 'sendfile' /tmp/aginx-sendfile-smoke.log
+```
+
+Run lokal sudah memperlihatkan partial sendfile dan EAGAIN lalu transfer selesai tanpa perubahan checksum. Ini membuktikan jalur dan recovery pada workload smoke tersebut; throughput/p99 tetap memerlukan benchmark tanpa tracer.
 
 Fuzz smoke 10 detik per target hanya pemeriksaan awal. Jalankan 1–24 jam di host khusus, batasi worker/memory dan simpan corpus yang memperluas coverage. Tambahkan differential HTTP corpus dari RFC, mutation CL/TE/whitespace, abrupt disconnect, dan state-machine transitions setelah body/proxy tersedia.
 

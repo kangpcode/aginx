@@ -20,6 +20,8 @@ jobs:
         run: test -z "$(gofmt -l cmd internal)"
       - name: Vet, tests, race, static build
         run: make check
+      - name: Live binary TCP and signal smoke
+        run: python3 scripts/live-smoke.py
       - name: Fuzz smoke
         run: make fuzz
       - name: Validate runnable sample
