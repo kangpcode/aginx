@@ -272,6 +272,11 @@ func TestShutdownDeadlineClosesActiveWriter(t *testing.T) {
 		t.Fatal(err)
 	}
 	conn := dial(t, connect)
+	if tcp, ok := conn.(*net.TCPConn); ok {
+		if err := tcp.SetReadBuffer(1024); err != nil {
+			t.Fatal(err)
+		}
+	}
 	io.WriteString(conn, "GET /large.bin HTTP/1.1\r\nHost: test\r\n\r\n")
 	resp, err := http.ReadResponse(bufio.NewReader(conn), nil)
 	if err != nil {

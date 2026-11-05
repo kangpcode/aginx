@@ -45,10 +45,14 @@ func CleanPath(value string) (string, error) {
 		return "", os.ErrPermission
 	}
 	parts := strings.Split(value, "/")
-	if len(parts) > 34 {
-		return "", os.ErrPermission
-	}
+	components := 0
 	for _, part := range parts {
+		if part != "" {
+			components++
+			if components > 32 {
+				return "", os.ErrPermission
+			}
+		}
 		if strings.HasPrefix(part, ".") {
 			return "", os.ErrPermission
 		}

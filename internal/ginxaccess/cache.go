@@ -112,7 +112,12 @@ func (c *Cache) Get(path string) (*Config, error) {
 	if err != nil {
 		return c.failed(e, err)
 	}
-	if identity(after) != version {
+	afterVersion := identity(after)
+	// Atomic rename dapat meng-unlink inode lama dan mengubah ctime descriptor
+	// yang sedang dibaca tanpa mengubah isinya. Tetap gunakan ctime pada key
+	// cache, tetapi cek stabilitas pembacaan memakai inode/device/mtime/size.
+	afterVersion.CTime = version.CTime
+	if afterVersion != version {
 		return c.failed(e, fmt.Errorf("file berubah selama dibaca; gunakan atomic rename"))
 	}
 	cfg, err := Parse(data)

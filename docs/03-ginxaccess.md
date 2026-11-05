@@ -19,7 +19,7 @@ match_block  = "<Match", ws, string, [ ws ], ">", eol,
                { line }, "</Match>", eol ;
 expression   = conjunction, { ws, "or", ws, conjunction } ;
 conjunction  = unary, { ws, "and", ws, unary } ;
-unary        = [ "not", ws ], predicate | "(", expression, ")" ;
+unary        = "not", ws, unary | predicate | "(", expression, ")" ;
 predicate    = "file_exists" | "dir_exists"
              | field, ws, operator, ws, string ;
 field        = "method" | "path" | "host" | "user_agent" | "referer" ;
@@ -70,7 +70,7 @@ Inheritance selalu menelusuri docroot sampai direktori target. ACL adalah **AND 
 
 Batas keamanan v1: 64 KiB per file dan 256 directive/file; full language membatasi nesting block 8, include 4 dan total expanded source 256 KiB; maksimal 32 komponen path plus terminal slash; 8 internal transitions, decoded path/output rewrite 8 KiB, regex source 1024 byte, dan maksimal 4096 evaluasi regex/request. Go regexp mempunyai waktu linear terhadap ukuran input untuk pola tetap; tidak ada backreference/lookaround PCRE. [Dokumentasi regexp](https://pkg.go.dev/regexp).
 
-Budget POC 20 ms diperiksa di antara evaluasi rewrite, bukan hard preemption terhadap sebuah regex atau syscall file. Full engine harus mempertahankan batas input/AST dan cooperative budget untuk seluruh fase; pola tunggal tetap harus selesai sebelum pengecekan berikutnya. Timeout dengan meluncurkan goroutine lalu meninggalkannya tidak digunakan karena menghabiskan resource. ACL/auth baru yang rusak tanpa snapshot lama harus fail closed.
+Budget POC 20 ms waktu evaluasi rewrite kumulatif diperiksa sebelum dan sesudah tiap rule, bukan hard preemption terhadap sebuah regex atau syscall file. Full engine harus mempertahankan batas input/AST dan cooperative budget untuk seluruh fase; pola tunggal tetap harus selesai sebelum pengecekan berikutnya. Timeout dengan meluncurkan goroutine lalu meninggalkannya tidak digunakan karena menghabiskan resource. ACL/auth baru yang rusak tanpa snapshot lama harus fail closed.
 
 Cache production mengindeks canonical relative path dengan identity `(device, inode, mtime_ns, ctime_ns, size)` dan generasi parent. Metadata membedakan versi; inotify menyegarkan lebih cepat dan menangkap perubahan yang timestamp-nya dipertahankan. Watch **direktori** untuk create/delete/rename/close-write, bukan hanya inode file. Saat `IN_Q_OVERFLOW`, directory move, atau watcher failure, tandai subtree stale dan rescan. Watcher tidak recursive otomatis; daftar direktori dibatasi dan direkonsiliasi. [inotify manual](https://man7.org/linux/man-pages/man7/inotify.7.html).
 
