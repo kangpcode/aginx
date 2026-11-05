@@ -2,7 +2,7 @@ GO ?= go
 export GOCACHE ?= /tmp/aginx-go-cache
 export GOMODCACHE ?= /tmp/aginx-go-modcache
 
-.PHONY: build test race vet check fuzz bench run
+.PHONY: build test race vet check fuzz bench smoke run
 build:
 	mkdir -p bin
 	CGO_ENABLED=0 $(GO) build -buildvcs=false -trimpath -ldflags='-s -w' -o bin/aginx ./cmd/aginx
@@ -18,5 +18,7 @@ fuzz:
 	$(GO) test ./internal/ginxaccess -run='^$$' -fuzz=FuzzParse -fuzztime=10s -parallel=2
 bench:
 	$(GO) test ./internal/ginxaccess -run='^$$' -bench=. -benchmem
+smoke: build
+	python3 scripts/live-smoke.py
 run: build
 	./bin/aginx -root ./examples/www

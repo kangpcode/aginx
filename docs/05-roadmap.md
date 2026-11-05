@@ -8,7 +8,8 @@ Estimasi untuk satu engineer berpengalaman, fokus penuh, termasuk review dan tes
 - [x] Source tree, Makefile, coding standard `gofmt`, `go vet`.
 - [x] Test harness unit, integration, race, dan fuzz.
 - [x] Workflow GitHub Actions tersedia, dengan TCP wajib.
-- [ ] Inisialisasi repository Git nyata dan aktifkan CI di GitHub; metadata Git belum tersedia di workspace ini.
+- [x] Repository Git tersedia pada workspace.
+- [ ] Konfirmasi workflow berjalan sukses di GitHub.
 - [ ] Pemilik menetapkan lisensi dan kebijakan kontribusi.
 - [ ] CI berjalan sukses pada stable/oldstable serta dependency/toolchain vulnerability scan.
 
