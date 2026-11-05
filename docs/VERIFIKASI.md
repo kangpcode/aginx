@@ -27,9 +27,8 @@ make check
 AGINX_REQUIRE_TCP=1 make check
 make fuzz
 make bench
+make smoke
 GOCACHE=/tmp/aginx-go-cache go test ./... -cover
-GOCACHE=/tmp/aginx-go-cache go test ./internal/server -v -count=1
-GOCACHE=/tmp/aginx-go-cache go test ./internal/server -run TestConcurrentClientsAndConfigChange -cover -count=30
 ./bin/aginx -t -config examples/www/.ginxaccess
 file bin/aginx
 readelf -l bin/aginx
@@ -61,7 +60,7 @@ Trace lengkap run ini berada di `/tmp/aginx-sendfile-smoke.log`; jalankan ulang 
 
 Kasus yang lulus mencakup framing CL/TE/duplicate Host, header besar dan slow header, keep-alive/pipelining/HEAD, checksum transfer file besar, partial write, drain response aktif, shutdown deadline, batas koneksi/idle, traversal encoded/raw, hidden file, symlink keluar/alias internal, FIFO, penolakan script server-side dasar, rewrite cycle/capture expansion limit, ACL parent/child, ACL sumber/tujuan rewrite, XFF spoofing, first-invalid fail closed, last-known-good setelah syntax error/SIGHUP, negative cache/create/delete/rename, bounded cache, serta concurrent config publish.
 
-Saat pengujian coverage, concurrent atomic rename pernah menghasilkan 503: unlink inode lama mengubah ctime descriptor meskipun isi snapshot tidak berubah. Perbaikannya mempertahankan ctime pada identity cache, tetapi validasi konsistensi pembacaan memakai device/inode/mtime/size. Pemeriksaan akhir dan regression berulang lulus setelah perbaikan.
+Pada verifikasi 4 November, concurrent atomic rename pernah menghasilkan 503 saat pengujian coverage: unlink inode lama mengubah ctime descriptor meskipun isi snapshot tidak berubah. Perbaikannya mempertahankan ctime pada identity cache, tetapi validasi konsistensi pembacaan memakai device/inode/mtime/size. Pemeriksaan akhir dan regression berulang lulus setelah perbaikan.
 
 Yang belum dibuktikan: perilaku TCP saat congestion/disconnect di jaringan nyata, benchmark wrk/h2load/ab, pembandingan Nginx/Apache, memory idle 100K koneksi, overhead policy <5%, soak 24 jam, chaos load, CI GitHub, packaging .deb/.rpm, compatibility kernel 4.18 dan empat distro. Tool benchmark/Nginx tidak tersedia pada environment ini. CI dikonfigurasi memakai `AGINX_REQUIRE_TCP=1` agar transport fallback tidak menyamarkan kekurangan verifikasi TCP, serta menjalankan smoke binary.
 
